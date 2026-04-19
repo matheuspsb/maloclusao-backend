@@ -32,9 +32,23 @@ export class AuthController {
     try {
       const { email, password } = loginSchema.parse(req.body);
       const result = await authService.login(email, password);
-      res.json({ data: result });
+
+      const isProduction = process.env.NODE_ENV === "production";
+      res.cookie("token", result.token, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      res.json({ data: { user: result.user } });
     } catch (err) {
       next(err);
     }
+  }
+
+  async logout(_req: Request, res: Response): Promise<void> {
+    res.clearCookie("token", { httpOnly: true, sameSite: "lax" });
+    res.status(204).send();
   }
 }

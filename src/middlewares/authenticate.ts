@@ -5,13 +5,11 @@ import { AppError } from "../utils/AppError";
 import { AuthRequest, AuthPayload } from "../types";
 
 export function authenticate(req: AuthRequest, _res: Response, next: NextFunction): void {
-  const authHeader = req.headers.authorization;
+  const token = req.cookies?.token as string | undefined;
 
-  if (!authHeader?.startsWith("Bearer ")) {
+  if (!token) {
     throw new AppError("Token not provided", 401);
   }
-
-  const token = authHeader.split(" ")[1];
 
   try {
     const payload = jwt.verify(token, env.JWT_SECRET) as AuthPayload;

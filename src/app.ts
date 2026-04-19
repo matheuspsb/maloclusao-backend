@@ -10,8 +10,8 @@ export const app = express();
 app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
 app.use(express.json());
 
-app.get("/health", (_req, res) => {
-  res.json({ status: "ok" });
+app.get("/ping", (_req, res) => {
+  res.json({ status: "pong" });
 });
 
 app.use("/api", router);

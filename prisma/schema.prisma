@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(STUDENT)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  evaluatedPatients Patient[] @relation("EvaluatedBy")
+
+  @@map("users")
+}
+
+model Patient {
+  id               String            @id @default(uuid())
+  name             String
+  age              Int
+  gender           Gender
+  guardian         String
+  malocclusion     MalocclusionClass
+  stabilometry     Float
+  stabilometryLevel StabilometryLevel
+  images           String[]
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+  evaluatedById String @map("evaluated_by_id")
+  evaluatedBy   User   @relation("EvaluatedBy", fields: [evaluatedById], references: [id])
+
+  @@map("patients")
+}
+
+enum Role {
+  PROFESSOR
+  STUDENT
+}
+
+enum Gender {
+  M
+  F
+}
+
+enum MalocclusionClass {
+  CLASSE_I
+  CLASSE_II
+  CLASSE_III
+  NENHUMA
+}
+
+enum StabilometryLevel {
+  NORMAL
+  LEVE
+  MODERADO
+  SEVERO
+}

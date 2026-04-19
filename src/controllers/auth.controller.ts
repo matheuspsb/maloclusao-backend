@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { z } from "zod";
 import { AuthService } from "../services/auth.service";
 import { UserRepository } from "../repositories/user.repository";
+import { AuthRequest } from "../types";
 
 const registerSchema = z.object({
   name: z.string().min(2),
@@ -42,6 +43,19 @@ export class AuthController {
       });
 
       res.json({ data: { user: result.user } });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async me(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const user = await new UserRepository().findById(req.user!.sub);
+      if (!user) {
+        res.status(401).json({ message: "User not found" });
+        return;
+      }
+      res.json({ data: { id: user.id, name: user.name, email: user.email, role: user.role } });
     } catch (err) {
       next(err);
     }

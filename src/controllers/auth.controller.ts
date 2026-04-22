@@ -38,7 +38,7 @@ export class AuthController {
       res.cookie("token", result.token, {
         httpOnly: true,
         secure: isProduction,
-        sameSite: "lax",
+        sameSite: isProduction ? "none" : "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
@@ -62,7 +62,8 @@ export class AuthController {
   }
 
   async logout(_req: Request, res: Response): Promise<void> {
-    res.clearCookie("token", { httpOnly: true, sameSite: "lax" });
+    const isProduction = process.env.NODE_ENV === "production";
+    res.clearCookie("token", { httpOnly: true, sameSite: isProduction ? "none" : "lax", secure: isProduction });
     res.status(204).send();
   }
 }

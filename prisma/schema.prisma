@@ -36,7 +36,26 @@ model Patient {
   evaluatedById String @map("evaluated_by_id")
   evaluatedBy   User   @relation("EvaluatedBy", fields: [evaluatedById], references: [id])
 
+  postureAnalyses PostureAnalysis[]
+
   @@map("patients")
+}
+
+model PostureAnalysis {
+  id                 String      @id @default(uuid())
+  view               PostureView @default(ANTERIOR)
+  imageUrl           String      @map("image_url")
+  shoulderTiltDeg    Float       @map("shoulder_tilt_deg")
+  hipTiltDeg         Float       @map("hip_tilt_deg")
+  shoulderOffsetX    Float       @map("shoulder_offset_x")
+  hipOffsetX         Float       @map("hip_offset_x")
+  landmarks          Json
+  createdAt          DateTime    @default(now()) @map("created_at")
+
+  patientId String  @map("patient_id")
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@map("posture_analyses")
 }
 
 enum Role {
@@ -61,4 +80,8 @@ enum StabilometryLevel {
   LEVE
   MODERADO
   SEVERO
+}
+
+enum PostureView {
+  ANTERIOR
 }
